@@ -1,8 +1,7 @@
 use anyhow::Result;
-use log::{info, error};
+use log::info;
 use std::process::Command;
 use std::path::PathBuf;
-use uuid::Uuid;
 
 pub struct StorageManager {
     root_device: String,
@@ -165,5 +164,38 @@ SYNC_ACL="yes"
         std::fs::write("/etc/snapper/configs/root", snapper_config)?;
 
         Ok(())
+    }
+
+    pub fn setup_encrypted_storage(&self) -> Result<()> {
+        info!("Setting up encrypted storage...");
+
+        // إنشاء قسم مشفر
+        Command::new("cryptsetup")
+            .args([
+                "luksFormat",
+                "--type", "luks2",
+                &self.root_device,
+            ])
+            .status()?;
+
+        // فتح القسم المشفر
+        Command::new("cryptsetup")
+            .args([
+                "open",
+                &self.root_device,
+                "cryptroot",
+            ])
+            .status()?;
+
+        // تهيئة نظام الملفات
+        Command::new("mkfs.ext4")
+            .args(["/dev/mapper/cryptroot"])
+            .status()?;
+
+        Ok(())
+    }
+
+    pub fn get_esp_path(&self) -> &PathBuf {
+        &self.esp_path
     }
 } 

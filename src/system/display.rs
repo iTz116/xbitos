@@ -1,5 +1,5 @@
 use anyhow::Result;
-use log::{info, error};
+use log::info;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -553,7 +553,8 @@ font="Noto Sans,10,-1,5,50,0,0,0,0,0"
     }
 
     fn setup_dunst_config(&self) -> Result<()> {
-        let dunst_config = r#"[global]
+        let dunst_config = r###"
+[global]
     monitor = 0
     follow = mouse
     width = 300
@@ -577,7 +578,7 @@ font="Noto Sans,10,-1,5,50,0,0,0,0,0"
     frame_color = "#89B4FA"
     separator_color = frame
     sort = yes
-    font = JetBrains Mono Nerd Font 10
+    font = "JetBrains Mono Nerd Font 10"
     line_height = 0
     markup = full
     format = "<b>%s</b>\n%b"
@@ -592,23 +593,13 @@ font="Noto Sans,10,-1,5,50,0,0,0,0,0"
     icon_position = left
     min_icon_size = 0
     max_icon_size = 32
-    icon_path = /usr/share/icons/Papirus-Dark/16x16/status/:/usr/share/icons/Papirus-Dark/16x16/devices/:/usr/share/icons/Papirus-Dark/16x16/apps/
     sticky_history = yes
     history_length = 20
-    browser = /usr/bin/xdg-open
+    browser = "/usr/bin/xdg-open"
     always_run_script = true
-    title = Dunst
-    class = Dunst
+    title = "Dunst"
+    class = "Dunst"
     corner_radius = 10
-    ignore_dbusclose = false
-    force_xwayland = false
-    force_xinerama = false
-    mouse_left_click = close_current
-    mouse_middle_click = do_action, close_current
-    mouse_right_click = close_all
-
-[experimental]
-    per_monitor_dpi = false
 
 [urgency_low]
     background = "#1E1E2E"
@@ -625,11 +616,10 @@ font="Noto Sans,10,-1,5,50,0,0,0,0,0"
     foreground = "#F38BA8"
     frame_color = "#F38BA8"
     timeout = 0
-"#;
+"###;
 
         fs::create_dir_all("/etc/dunst")?;
         fs::write("/etc/dunst/dunstrc", dunst_config)?;
-
         Ok(())
     }
 } 

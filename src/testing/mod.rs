@@ -3,8 +3,7 @@ pub mod package_tests;
 pub mod security_tests;
 
 use anyhow::Result;
-use log::{info, error};
-use std::process::Command;
+use log::info;
 
 pub struct TestRunner {
     test_dir: std::path::PathBuf,
@@ -43,5 +42,9 @@ impl TestRunner {
     fn run_security_tests(&self) -> Result<()> {
         security_tests::run_tests()?;
         Ok(())
+    }
+
+    pub fn get_test_dir(&self) -> &std::path::PathBuf {
+        &self.test_dir
     }
 } 

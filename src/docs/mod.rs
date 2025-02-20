@@ -1,6 +1,5 @@
 use anyhow::Result;
 use log::info;
-use std::fs;
 use std::path::PathBuf;
 
 pub struct DocumentationBuilder {
@@ -44,5 +43,9 @@ impl DocumentationBuilder {
     fn build_installation_guide(&self) -> Result<()> {
         // بناء دليل التثبيت
         Ok(())
+    }
+
+    pub fn get_paths(&self) -> (&PathBuf, &PathBuf) {
+        (&self.docs_dir, &self.output_dir)
     }
 } 

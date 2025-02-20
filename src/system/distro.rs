@@ -1,6 +1,5 @@
 use anyhow::Result;
-use log::{info, error};
-use std::process::Command;
+use log::info;
 use std::path::PathBuf;
 use std::fs;
 

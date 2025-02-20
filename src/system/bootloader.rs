@@ -1,9 +1,8 @@
 use anyhow::Result;
-use log::{info, error};
+use log::info;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use uuid::Uuid;
 
 pub struct BootManager {
     esp_path: PathBuf,

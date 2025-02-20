@@ -1,5 +1,5 @@
 use anyhow::Result;
-use log::{info, error};
+use log::info;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 use std::fs;
@@ -26,7 +26,7 @@ pub struct SoftwareCenter {
 
 impl SoftwareCenter {
     pub fn new() -> Result<Self> {
-        let instance = Self {
+        let mut instance = Self {
             db_path: PathBuf::from("/var/lib/xbitos/software"),
             cache_path: PathBuf::from("/var/cache/xbitos/packages"),
             packages: HashMap::new(),
@@ -36,7 +36,7 @@ impl SoftwareCenter {
         Ok(instance)
     }
 
-    fn initialize(&self) -> Result<()> {
+    fn initialize(&mut self) -> Result<()> {
         fs::create_dir_all(&self.db_path)?;
         fs::create_dir_all(&self.cache_path)?;
         
@@ -46,40 +46,33 @@ impl SoftwareCenter {
         Ok(())
     }
 
-    pub fn update_database(&self) -> Result<()> {
+    pub fn update_database(&mut self) -> Result<()> {
         info!("Updating software database...");
 
-        // تحديث مستودعات pacman
         Command::new("pacman")
             .args(["-Sy"])
             .status()?;
 
-        // تحديث قاعدة بيانات البرامج المحلية
         self.sync_local_database()?;
-
         Ok(())
     }
 
-    pub fn install_package(&self, package_name: &str) -> Result<()> {
+    pub fn install_package(&mut self, package_name: &str) -> Result<()> {
         info!("Installing package: {}", package_name);
 
-        // التحقق من وجود الحزمة
         if !self.packages.contains_key(package_name) {
             return Err(anyhow::anyhow!("Package not found"));
         }
 
-        // تثبيت الحزمة
         Command::new("pacman")
             .args(["-S", "--noconfirm", package_name])
             .status()?;
 
-        // تحديث قاعدة البيانات المحلية
         self.sync_local_database()?;
-
         Ok(())
     }
 
-    pub fn remove_package(&self, package_name: &str) -> Result<()> {
+    pub fn remove_package(&mut self, package_name: &str) -> Result<()> {
         info!("Removing package: {}", package_name);
 
         Command::new("pacman")
@@ -87,7 +80,6 @@ impl SoftwareCenter {
             .status()?;
 
         self.sync_local_database()?;
-
         Ok(())
     }
 
@@ -105,7 +97,7 @@ impl SoftwareCenter {
         self.packages.get(package_name)
     }
 
-    fn sync_local_database(&self) -> Result<()> {
+    fn sync_local_database(&mut self) -> Result<()> {
         // تحديث قائمة الحزم المثبتة
         let installed = Command::new("pacman")
             .args(["-Q"])

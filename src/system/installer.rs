@@ -1,5 +1,5 @@
 use anyhow::Result;
-use log::{info, error};
+use log::info;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -94,11 +94,7 @@ impl SystemInstaller {
         info!("Configuring system...");
 
         // إعداد المنطقة الزمنية
-        let timezone_path = self.mount_point.join("etc/localtime");
-        std::os::unix::fs::symlink(
-            format!("/usr/share/zoneinfo/{}", self.config.timezone),
-            timezone_path,
-        )?;
+        self.setup_timezone()?;
 
         // إعداد اللغة
         let locale_gen = format!("{} UTF-8", self.config.locale);
@@ -167,6 +163,25 @@ impl SystemInstaller {
                 .args([&self.mount_point.to_string_lossy(), "sh", "-c", cmd])
                 .status()?;
         }
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    fn setup_timezone(&self) -> Result<()> {
+        std::os::unix::fs::symlink(
+            format!("/usr/share/zoneinfo/{}", self.config.timezone),
+            self.mount_point.join("etc/localtime"),
+        )?;
+        Ok(())
+    }
+
+    #[cfg(not(unix))]
+    fn setup_timezone(&self) -> Result<()> {
+        // على Windows نستخدم نسخ الملف بدلاً من الرابط الرمزي
+        std::fs::copy(
+            format!("/usr/share/zoneinfo/{}", self.config.timezone),
+            self.mount_point.join("etc/localtime"),
+        )?;
         Ok(())
     }
 } 

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use log::{info, error};
+use log::info;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -28,8 +28,8 @@ impl IsoBuilder {
         // إعداد ملفات التكوين
         self.setup_config_files()?;
 
-        // نسخ الملفات الأساسية
-        self.copy_base_files()?;
+        // تثبيت الحزم المطلوبة
+        self.setup_packages()?;
 
         // إعداد برنامج التثبيت
         self.setup_installer()?;
